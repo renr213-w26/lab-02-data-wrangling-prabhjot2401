@@ -56,14 +56,83 @@ midwest |>
 
 
 ```
+\newpage
+### Question 4
+```{r}
+midwest|>summarize(median(popdensity),IQR1=quantile(popdensity,0.25),IQR3=quantile(popdensity,0.75))
+```
 
+The distribution of population density of counties is unimodal and extremely right-skewed. A typical Midwestern county has population density of 1156 people per unit area. The middle 50% of the counties have population densities between 622 to 2330 people per unit area.
 \newpage
 
 ### Question 5
+```{r}
+#| echo: false
+#| message: true
+midwest_ <- midwest |>mutate(metro = if_else(inmetro == 1, "Yes", "No"))|> group_by(state) |> summarise(
+    metro_popln = sum(metro == "Yes"),
+    not_metro_popln = sum(metro == "No"),
+    total_popln = n(),
+    metro_proportion = metro_popln / total_popln,
+    not_metro_proportion = not_metro_popln / total_popln
+) |> select(state, metro_proportion, not_metro_proportion)
+
+midwest_
+```
 
 \newpage
 
 ### Question 6
+A
+```{r}
+midwest |>
+    filter (percollege < 10 & percbelowpoverty > 48) |>
+    select (county, state, percbelowpoverty, percollege)
+```
+
+B
+```{r}
+midwest |>
+    filter (percollege >40 & percbelowpoverty < 17) |>
+    select (county, state, percbelowpoverty, percollege)
+```
+C
+```{r}
+midwest |>
+    filter ((percollege < 10 &
+                 percbelowpoverty > 48) | (percollege > 40 &
+                                               percbelowpoverty < 17)) |>
+    select (county, state, percbelowpoverty, percollege)
+```
+D
+```{r}
+midwest |>
+    mutate(potential_outlier = if_else(
+        (percollege < 10 &
+             percbelowpoverty > 48) | (percollege > 40 &
+                                           percbelowpoverty < 17),
+        "Yes",
+        "No"
+    )) |>
+    select(county, state, percbelowpoverty, percollege, potential_outlier) |>
+    arrange(potential_outlier)
+```
+E
+```{r}
+midwest |>
+    mutate(potential_outlier = if_else(
+        (percollege < 10 &
+             percbelowpoverty > 48) | (percollege > 40 &
+                                           percbelowpoverty < 17),
+        "Yes",
+        "No"
+    )) |> ggplot(aes(
+        x = percollege,
+        y = percbelowpoverty,
+        colour = potential_outlier,
+        shape = state
+    )) + geom_point() + labs(title = "Population below the Poverty Line by Population with College Degree",subtitle = "by percentage", x = "Population with College Degree (%)", y = "Population below the Poverty Line (%)", )
+```
 
 \newpage
 
