@@ -165,7 +165,36 @@ Indiana has the lowest average percentage(10.31%) living below poverty and Michi
 \newpage
 
 ## Part 2
+```{r}
+df <- tibble(
+  var_1 = c(10, 20, 30, 40, 50),
+  var_2 = c("Pizza", "Burger", "Pizza", "Pizza", "Burger"),
+  var_3 = c("Apple", "Apple", "Pear", "Pear", "Banana")
+)
+
+df
+```
 
 
 ### Question 9
+A
+```{r}
+df |>
+  arrange(var_2)
+```
+Arrange function sorted the all the rows based on the entries in the var_2 column by ascending alphabetical order
 
+B
+```{r}
+df |>
+  group_by(var_2)
+```
+group_by function had no effect in this code chunk, but it groups the values based on the column passed as an argument. When we compare arrange with group_by function, arrange function sorts the rows based on the passed column and group_by groups rows that share the same value in the passed column.
+
+C
+```{r}
+df |>
+  group_by(var_2) |>
+  summarize(mean_var_1 = mean(var_1))
+```
+This chunk groups the data based on the passed column var_2 that share the same value, then it creates two rows based on the mean_values of var_1 found within each new grouping in the "summarize" part.
