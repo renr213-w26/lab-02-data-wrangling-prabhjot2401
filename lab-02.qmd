@@ -1,7 +1,7 @@
 ---
 title: "Lab 2 - Data wrangling"
-author: "John Q. Student"
-date: "June 24, 1497"
+author: "Prabhjot Singh"
+date: "12 Feb, 2026"
 format: 
   html: default # for speed
   pdf: default # for final output
@@ -16,41 +16,213 @@ format:
 library(tidyverse)
 ```
 
+```{r}
+midwest
+```
 
 # Questions
 
 ## Part 1
 
 ### Question 1
+```{r}
+#| eval: true
+#| message: false
 
+midwest|>count(state)|>arrange(desc(n))
+```
+#### Illinois has the highest number of counties (102), and Wisconsin has lowest number of counties (72)
 
 \newpage
 
 ### Question 2
-
+```{r}
+midwest |>
+  count(county, state) |>
+  count(county, name = "freq") |>
+  filter(freq >= 2)
+```
 \newpage
 
 ### Question 3
+```{r}
+midwest |>filter(popdensity > 25000) |>select(county, state, popdensity, poptotal, area)|>arrange(desc(popdensity))
+
+```
+```{r}
+midwest |>
+  filter(popdensity == max(popdensity)) |>
+  select(county, state, popdensity, poptotal, area)
+
+
+```
+\newpage
+### Question 4
+```{r}
+midwest|>summarize(median(popdensity),IQR1=quantile(popdensity,0.25),IQR3=quantile(popdensity,0.75))
+```
+
+The distribution of population density of counties is unimodal and extremely right-skewed. A typical Midwestern county has population density of 1156 people per unit area. The middle 50% of the counties have population densities between 622 to 2330 people per unit area.
 \newpage
 
 ### Question 5
+```{r}
+#| echo: false
+#| message: true
+midwest_ <- midwest |>mutate(metro = if_else(inmetro == 1, "Yes", "No"))|> group_by(state) |> summarise(
+    metro_popln = sum(metro == "Yes"),
+    not_metro_popln = sum(metro == "No"),
+    total_popln = n(),
+    metro_proportion = metro_popln / total_popln,
+    not_metro_proportion = not_metro_popln / total_popln
+) |> select(state, metro_proportion, not_metro_proportion)
+
+midwest_
+```
 
 \newpage
 
 ### Question 6
+A
+```{r}
+midwest |>
+    filter (percollege < 10 & percbelowpoverty > 48) |>
+    select (county, state, percbelowpoverty, percollege)
+```
+
+B
+```{r}
+midwest |>
+    filter (percollege >40 & percbelowpoverty < 17) |>
+    select (county, state, percbelowpoverty, percollege)
+```
+C
+```{r}
+midwest |>
+    filter ((percollege < 10 &
+                 percbelowpoverty > 48) | (percollege > 40 &
+                                               percbelowpoverty < 17)) |>
+    select (county, state, percbelowpoverty, percollege)
+```
+D
+```{r}
+midwest |>
+    mutate(potential_outlier = if_else(
+        (percollege < 10 &
+             percbelowpoverty > 48) | (percollege > 40 &
+                                           percbelowpoverty < 17),
+        "Yes",
+        "No"
+    )) |>
+    select(county, state, percbelowpoverty, percollege, potential_outlier) |>
+    arrange(potential_outlier)
+```
+E
+```{r}
+midwest |>
+    mutate(potential_outlier = if_else(
+        (percollege < 10 &
+             percbelowpoverty > 48) | (percollege > 40 &
+                                           percbelowpoverty < 17),
+        "Yes",
+        "No"
+    )) |> ggplot(aes(
+        x = percollege,
+        y = percbelowpoverty,
+        colour = potential_outlier,
+        shape = state
+    )) + geom_point() + labs(title = "Population below the Poverty Line by Population with College Degree",subtitle = "by percentage", x = "Population with College Degree (%)", y = "Population below the Poverty Line (%)", )
+```
 
 \newpage
 
 ### Question 7
+A
+```{r}
+state_population <- midwest |>
+    group_by(state) |>
+    summarise(total_popln = sum(poptotal)) |>
+    arrange(desc(total_popln))
+state_population
+```
+B
+```{r}
+state_population|>mutate(popln_proportion=total_popln/sum(total_popln))|>arrange(desc(popln_proportion))
+```
+
+C
+Illinois has the biggest proportion (27%) of people living there, Wisconsin has the smallest proportion(11%) of people living there
 
 \newpage
 
 ### Question 8
+```{r}
+state_poverty<-midwest|>group_by(state)|>summarise(mean_percbelowpoverty=mean(percbelowpoverty))
+state_poverty|>arrange(mean_percbelowpoverty)
+```
+Indiana has the lowest average percentage(10.31%) living below poverty and Michigan has the highest average percentage(14.22%) living below poverty.
 
 \newpage
 
 ## Part 2
+```{r}
+df <- tibble(
+  var_1 = c(10, 20, 30, 40, 50),
+  var_2 = c("Pizza", "Burger", "Pizza", "Pizza", "Burger"),
+  var_3 = c("Apple", "Apple", "Pear", "Pear", "Banana")
+)
+
+df
+```
 
 
 ### Question 9
+A
+```{r}
+df |>
+  arrange(var_2)
+```
+Arrange function sorted the all the rows based on the entries in the var_2 column by ascending alphabetical order
 
+B
+```{r}
+df |>
+  group_by(var_2)
+```
+group_by function had no effect in this code chunk, but it groups the values based on the column passed as an argument. When we compare arrange with group_by function, arrange function sorts the rows based on the passed column and group_by groups rows that share the same value in the passed column.
+
+C
+```{r}
+df |>
+  group_by(var_2) |>
+  summarize(mean_var_1 = mean(var_1))
+```
+This chunk groups the data based on the passed column var_2 that share the same value, then it creates two rows based on the mean_values of var_1 found within each new grouping in the "summarize" part.
+
+D
+```{r}
+df |>
+  group_by(var_2, var_3) |>
+  summarize(mean_var_1 = mean(var_1))
+```
+This chunk created groupings based on var_2 and var_3 in the group_by section. It created a new temporary column for the summarize section called mean_var_1 that has the mean values of rows of var_1. The message says that the summarize is based on var_2 and to change that you can use ".groups" argument.
+
+E
+```{r}
+df |>
+  group_by(var_2, var_3) |>
+  summarize(mean_var_1 = mean(var_1), .groups = "drop")
+```
+This chunk does pretty much the same thing as the last one with one exception, ".groups" ungroups the data after it summarizes
+
+F
+```{r}
+df |>
+  group_by(var_2, var_3) |>
+  summarize(mean_var_1 = mean(var_1), .groups = "drop")
+
+df |>
+  group_by(var_2, var_3) |>
+  mutate(mean_var_1 = mean(var_1))
+```
+In the first chunk it summarizes the columns and uses ".groups" to ungroup the values after summarizing, in the second chunk it mutates the dataframe by creating a new variable called "mean_var_1"
