@@ -137,10 +137,30 @@ midwest |>
 \newpage
 
 ### Question 7
+A
+```{r}
+state_population <- midwest |>
+    group_by(state) |>
+    summarise(total_popln = sum(poptotal)) |>
+    arrange(desc(total_popln))
+state_population
+```
+B
+```{r}
+state_population|>mutate(popln_proportion=total_popln/sum(total_popln))|>arrange(desc(popln_proportion))
+```
+
+C
+Illinois has the biggest proportion (27%) of people living there, Wisconsin has the smallest proportion(11%) of people living there
 
 \newpage
 
 ### Question 8
+```{r}
+state_poverty<-midwest|>group_by(state)|>summarise(mean_percbelowpoverty=mean(percbelowpoverty))
+state_poverty|>arrange(mean_percbelowpoverty)
+```
+Indiana has the lowest average percentage(10.31%) living below poverty and Michigan has the highest average percentage(14.22%) living below poverty.
 
 \newpage
 
