@@ -16,6 +16,9 @@ format:
 library(tidyverse)
 ```
 
+```{r}
+midwest
+```
 
 # Questions
 
@@ -33,10 +36,27 @@ midwest|>count(state)|>arrange(desc(n))
 \newpage
 
 ### Question 2
-
+```{r}
+midwest |>
+  count(county, state) |>
+  count(county, name = "freq") |>
+  filter(freq >= 2)
+```
 \newpage
 
 ### Question 3
+```{r}
+midwest |>filter(popdensity > 25000) |>select(county, state, popdensity, poptotal, area)|>arrange(desc(popdensity))
+
+```
+```{r}
+midwest |>
+  filter(popdensity == max(popdensity)) |>
+  select(county, state, popdensity, poptotal, area)
+
+
+```
+
 \newpage
 
 ### Question 5
