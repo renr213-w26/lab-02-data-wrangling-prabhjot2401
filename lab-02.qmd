@@ -198,3 +198,31 @@ df |>
   summarize(mean_var_1 = mean(var_1))
 ```
 This chunk groups the data based on the passed column var_2 that share the same value, then it creates two rows based on the mean_values of var_1 found within each new grouping in the "summarize" part.
+
+D
+```{r}
+df |>
+  group_by(var_2, var_3) |>
+  summarize(mean_var_1 = mean(var_1))
+```
+This chunk created groupings based on var_2 and var_3 in the group_by section. It created a new temporary column for the summarize section called mean_var_1 that has the mean values of rows of var_1. The message says that the summarize is based on var_2 and to change that you can use ".groups" argument.
+
+E
+```{r}
+df |>
+  group_by(var_2, var_3) |>
+  summarize(mean_var_1 = mean(var_1), .groups = "drop")
+```
+This chunk does pretty much the same thing as the last one with one exception, ".groups" ungroups the data after it summarizes
+
+F
+```{r}
+df |>
+  group_by(var_2, var_3) |>
+  summarize(mean_var_1 = mean(var_1), .groups = "drop")
+
+df |>
+  group_by(var_2, var_3) |>
+  mutate(mean_var_1 = mean(var_1))
+```
+In the first chunk it summarizes the columns and uses ".groups" to ungroup the values after summarizing, in the second chunk it mutates the dataframe by creating a new variable called "mean_var_1"
